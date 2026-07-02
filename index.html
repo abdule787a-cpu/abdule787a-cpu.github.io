@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LotaModel — Where Ideas Take Form.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #050607;
+    --bg-raise: #0C0F12;
+    --panel: #101317;
+    --line: #1D2227;
+    --ink: #F3F5F7;
+    --ink-dim: #8A9199;
+    --silver-a: #E7EAED;
+    --silver-b: #8B939B;
+    --blue: #2B9BDB;
+    --blue-bright: #57C2FF;
+    --blue-dim: #16455F;
+    --mono: 'JetBrains Mono', monospace;
+    --disp: 'Space Grotesk', sans-serif;
+    --sans: 'Inter', sans-serif;
+  }
+
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{ background:var(--bg); color:var(--ink); font-family:var(--sans); overflow-x:hidden; }
+  a{ color:inherit; text-decoration:none; }
+  ::selection{ background:var(--blue); color:#04070A; }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; scroll-behavior:auto !important; }
+  }
+
+  .wrap{ max-width:1240px; margin:0 auto; padding:0 40px; }
+  @media (max-width:720px){ .wrap{ padding:0 22px; } }
+
+  /* ---------- nav ---------- */
+  header{
+    position:fixed; top:0; left:0; right:0; z-index:50;
+    background:linear-gradient(180deg, rgba(5,6,7,0.94), rgba(5,6,7,0));
+    padding:26px 0 44px;
+  }
+  nav.wrap{ display:flex; align-items:center; justify-content:space-between; }
+
+  .logo{ display:flex; align-items:center; gap:11px; }
+  .logo svg{ width:30px; height:30px; display:block; }
+  .logo .wordmark{ font-family:var(--disp); font-weight:600; font-size:19px; letter-spacing:0.01em; }
+  .logo .wordmark .m{ color:var(--blue); }
+
+  .navlinks{ display:flex; gap:38px; font-family:var(--mono); font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-dim); }
+  .navlinks a{ transition:color .25s ease; }
+  .navlinks a:hover{ color:var(--ink); }
+  a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible{ outline:1px solid var(--blue); outline-offset:4px; }
+  @media (max-width:760px){ .navlinks{ display:none; } }
+
+  /* ---------- hero ---------- */
+  .hero{ position:relative; min-height:100svh; display:flex; align-items:center; border-bottom:1px solid var(--line); }
+  #scene{ position:absolute; inset:0; z-index:0; }
+  #scene canvas{ display:block; }
+  .hero-veil{
+    position:absolute; inset:0; z-index:1; pointer-events:none;
+    background: radial-gradient(ellipse 58% 52% at 70% 46%, rgba(5,6,7,0) 0%, rgba(5,6,7,0.6) 58%, rgba(5,6,7,0.97) 100%);
+  }
+  .hero-content{ position:relative; z-index:2; padding-top:50px; }
+  .eyebrow{
+    font-family:var(--mono); font-size:12px; letter-spacing:0.16em; text-transform:uppercase;
+    color:var(--blue-bright); display:flex; align-items:center; gap:12px; margin-bottom:28px;
+  }
+  .eyebrow::before{ content:''; width:26px; height:1px; background:var(--blue-bright); }
+
+  h1.display{
+    font-family:var(--disp); font-weight:700; letter-spacing:-0.01em;
+    font-size:clamp(44px, 7.6vw, 96px); line-height:1.0; max-width:780px;
+    background:linear-gradient(115deg, var(--silver-a) 20%, var(--silver-b) 55%, var(--silver-a) 80%);
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+  }
+  h1.display .accent{ background:linear-gradient(115deg, var(--blue-bright), var(--blue)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+
+  .hero-sub{ margin-top:26px; max-width:480px; font-size:16px; line-height:1.7; color:var(--ink-dim); }
+
+  .hero-meta{ margin-top:54px; display:flex; gap:54px; flex-wrap:wrap; }
+  .hero-meta .stat{ font-family:var(--mono); }
+  .hero-meta .stat b{ display:block; font-size:25px; color:var(--blue-bright); font-weight:500; }
+  .hero-meta .stat span{ font-size:11.5px; color:var(--ink-dim); text-transform:uppercase; letter-spacing:0.08em; }
+
+  .hero-hint{
+    position:absolute; bottom:38px; left:40px; z-index:2;
+    font-family:var(--mono); font-size:11px; color:var(--ink-dim); letter-spacing:0.08em;
+    display:flex; align-items:center; gap:10px;
+  }
+  .hero-hint .dot{ width:6px; height:6px; border-radius:50%; background:var(--blue-bright); animation:pulse 2.2s ease-in-out infinite; }
+  @keyframes pulse{ 0%,100%{ opacity:0.3;} 50%{ opacity:1;} }
+  @media (max-width:720px){ .hero-hint{ display:none; } }
+
+  /* ---------- section scaffolding ---------- */
+  section{ padding:130px 0; border-bottom:1px solid var(--line); position:relative; }
+  .section-head{ display:flex; justify-content:space-between; align-items:flex-end; gap:40px; margin-bottom:74px; flex-wrap:wrap; }
+  .section-tag{ font-family:var(--mono); font-size:12px; color:var(--blue-dim); letter-spacing:0.14em; text-transform:uppercase; margin-bottom:16px; }
+  .section-tag b{ color:var(--blue); font-weight:500; }
+  h2.section-title{ font-family:var(--disp); font-weight:600; font-size:clamp(30px, 3.8vw, 48px); max-width:620px; color:var(--ink); }
+  .section-note{ max-width:280px; font-size:14px; color:var(--ink-dim); line-height:1.6; }
+
+  /* ---------- services ---------- */
+  .services{ display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line); border:1px solid var(--line); }
+  .svc{ background:var(--bg); padding:38px 28px 44px; transition:background .3s ease; }
+  .svc:hover{ background:var(--bg-raise); }
+  .svc-num{ font-family:var(--mono); font-size:12px; color:var(--blue); margin-bottom:30px; }
+  .svc-icon{ width:34px; height:34px; margin-bottom:22px; }
+  .svc h3{ font-family:var(--disp); font-weight:600; font-size:19px; margin-bottom:10px; }
+  .svc p{ font-size:13.5px; color:var(--ink-dim); line-height:1.65; }
+  @media (max-width:900px){ .services{ grid-template-columns:1fr 1fr; } }
+  @media (max-width:560px){ .services{ grid-template-columns:1fr; } }
+
+  /* ---------- work ---------- */
+  .work-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:28px; }
+  @media (max-width:900px){ .work-grid{ grid-template-columns:1fr 1fr; } }
+  @media (max-width:620px){ .work-grid{ grid-template-columns:1fr; } }
+
+  .card{ perspective:1200px; height:330px; position:relative; }
+  .card-face{
+    position:absolute; inset:0; background:var(--panel); border:1px solid var(--line);
+    padding:26px; display:flex; flex-direction:column; justify-content:flex-end;
+    transform-style:preserve-3d; transform:rotateX(0deg) rotateY(0deg);
+    transition:transform .5s cubic-bezier(.2,.8,.2,1), border-color .5s ease;
+    overflow:hidden;
+  }
+  .card:hover .card-face{ transform:rotateX(-4deg) rotateY(6deg) translateZ(6px); border-color:var(--blue-dim); }
+  .card-plane{
+    position:absolute; inset:0;
+    background:
+      linear-gradient(115deg, transparent 40%, rgba(43,155,219,0.10) 41%, transparent 42%),
+      repeating-linear-gradient(115deg, transparent 0 26px, rgba(255,255,255,0.025) 26px 27px);
+  }
+  .card-tag{ font-family:var(--mono); font-size:11px; color:var(--blue-bright); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:10px; position:relative; }
+  .card h3{ font-family:var(--disp); font-weight:600; font-size:24px; margin-bottom:8px; position:relative; }
+  .card p{ font-size:13px; color:var(--ink-dim); position:relative; max-width:88%; }
+  .card-index{ position:absolute; top:22px; right:24px; font-family:var(--mono); font-size:12px; color:var(--ink-dim); }
+
+  /* ---------- process strip ---------- */
+  .strip{ display:grid; grid-template-columns:1.2fr 1fr; gap:80px; align-items:center; }
+  @media (max-width:820px){ .strip{ grid-template-columns:1fr; gap:50px; } }
+  .strip p.lead{ font-size:19px; line-height:1.7; color:var(--ink); max-width:520px; }
+  .strip p.lead b{ color:var(--blue-bright); font-weight:500; }
+  .metric-list{ display:flex; flex-direction:column; }
+  .metric-row{ display:flex; justify-content:space-between; padding:20px 0; border-top:1px solid var(--line); }
+  .metric-row:last-child{ border-bottom:1px solid var(--line); }
+  .metric-row .label{ font-size:13px; color:var(--ink-dim); }
+  .metric-row .val{ font-family:var(--mono); font-size:15px; color:var(--blue-bright); }
+
+  /* ---------- contact ---------- */
+  .contact-inner{ display:grid; grid-template-columns:1.1fr 0.9fr; gap:80px; }
+  @media (max-width:820px){ .contact-inner{ grid-template-columns:1fr; gap:50px; } }
+  .contact-inner h2{ font-family:var(--disp); font-weight:600; font-size:clamp(32px,4.2vw,52px); line-height:1.15; margin-bottom:28px; }
+  .contact-inner > div:first-child p{ color:var(--ink-dim); max-width:420px; line-height:1.7; margin-bottom:36px; }
+
+  .cta-btn{
+    display:inline-flex; align-items:center; gap:12px; font-family:var(--mono); font-size:13px;
+    letter-spacing:0.06em; text-transform:uppercase; color:#04070A; background:linear-gradient(115deg, var(--blue-bright), var(--blue));
+    padding:16px 26px; border:none; cursor:pointer; transition:transform .25s ease, filter .25s ease;
+  }
+  .cta-btn:hover{ filter:brightness(1.1); transform:translateY(-2px); }
+
+  form{ display:flex; flex-direction:column; gap:22px; }
+  .field label{ display:block; font-family:var(--mono); font-size:11px; color:var(--ink-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:9px; }
+  .field input, .field textarea{
+    width:100%; background:transparent; border:none; border-bottom:1px solid var(--line);
+    color:var(--ink); font-family:var(--sans); font-size:15px; padding:8px 0; resize:none;
+    transition:border-color .25s ease;
+  }
+  .field input:focus, .field textarea:focus{ outline:none; border-color:var(--blue); }
+  .field textarea{ min-height:70px; }
+
+  footer{ padding:50px 0; }
+  footer .wrap{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:20px; }
+  footer .flogo{ display:flex; align-items:center; gap:10px; opacity:0.8; }
+  footer .flogo svg{ width:20px; height:20px; }
+  footer .flogo span{ font-family:var(--disp); font-weight:600; font-size:14px; color:var(--ink-dim); }
+  footer .ftag{ font-family:var(--mono); font-size:11px; color:var(--ink-dim); letter-spacing:0.06em; }
+  footer .flinks{ display:flex; gap:28px; font-family:var(--mono); font-size:12px; color:var(--ink-dim); text-transform:uppercase; letter-spacing:0.06em; }
+  footer .flinks a:hover{ color:var(--blue-bright); }
+
+  .reveal{ opacity:0; transform:translateY(24px); transition:opacity .7s ease, transform .7s ease; }
+  .reveal.in{ opacity:1; transform:translateY(0); }
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="wrap">
+    <div class="logo">
+      <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8 8H22V44H36V52H8V8Z" fill="url(#silverGrad)"/>
+        <path d="M22 8H32L38 20L44 8H54V52H44V26L38 36L32 26V52H22V8Z" fill="url(#blueGrad)"/>
+        <defs>
+          <linearGradient id="silverGrad" x1="8" y1="8" x2="36" y2="52" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#EDEFF1"/><stop offset="1" stop-color="#8B939B"/>
+          </linearGradient>
+          <linearGradient id="blueGrad" x1="22" y1="8" x2="54" y2="52" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#57C2FF"/><stop offset="1" stop-color="#2B9BDB"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <div class="wordmark">LOTA<span class="m">MODEL</span></div>
+    </div>
+    <div class="navlinks">
+      <a href="#services">Services</a>
+      <a href="#work">Work</a>
+      <a href="#process">Process</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </nav>
+</header>
+
+<section class="hero">
+  <div id="scene"></div>
+  <div class="hero-veil"></div>
+  <div class="wrap hero-content">
+    <div class="eyebrow">3D Modeling &amp; Visualization Studio</div>
+    <h1 class="display">Where ideas<br>take <span class="accent">form.</span></h1>
+    <p class="hero-sub">LotaModel turns sketches, specs, and half-formed concepts into precise 3D models — for products headed to manufacturing, and scenes headed to the screen.</p>
+    <div class="hero-meta">
+      <div class="stat"><b>310+</b><span>Models Delivered</span></div>
+      <div class="stat"><b>48H</b><span>Avg. First Draft</span></div>
+      <div class="stat"><b>17</b><span>Industries Served</span></div>
+    </div>
+  </div>
+  <div class="hero-hint"><span class="dot"></span> DRAG TO ROTATE — WATCH IT FORM</div>
+</section>
+
+<section id="services">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="section-tag">01 — <b>What We Build</b></div>
+        <h2 class="section-title">One studio, the whole pipeline from concept to file.</h2>
+      </div>
+      <p class="section-note">Every service runs on the same base mesh — nothing gets rebuilt from scratch between stages.</p>
+    </div>
+    <div class="services reveal">
+      <div class="svc">
+        <div class="svc-num">SVC 01</div>
+        <svg class="svc-icon" viewBox="0 0 34 34" fill="none"><path d="M17 2 30 9.5V24.5L17 32 4 24.5V9.5L17 2Z" stroke="#2B9BDB" stroke-width="1.6"/><path d="M4 9.5 17 17 30 9.5M17 17V32" stroke="#8B939B" stroke-width="1.2"/></svg>
+        <h3>3D Modeling</h3>
+        <p>Product, mechanical, and organic modeling built to real-world tolerances — CAD-ready or render-ready.</p>
+      </div>
+      <div class="svc">
+        <div class="svc-num">SVC 02</div>
+        <svg class="svc-icon" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="13" stroke="#2B9BDB" stroke-width="1.6"/><path d="M8 17a9 9 0 0 1 18 0" stroke="#8B939B" stroke-width="1.2"/><circle cx="17" cy="17" r="3" fill="#57C2FF"/></svg>
+        <h3>Rendering</h3>
+        <p>Photoreal stills and turntables lit and shaded to match your actual materials, not stock presets.</p>
+      </div>
+      <div class="svc">
+        <div class="svc-num">SVC 03</div>
+        <svg class="svc-icon" viewBox="0 0 34 34" fill="none"><path d="M4 26 12 10 18 20 22 14 30 26" stroke="#2B9BDB" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        <h3>Animation</h3>
+        <p>Assembly sequences, product spins, and explainer motion built from the same rigged model.</p>
+      </div>
+      <div class="svc">
+        <div class="svc-num">SVC 04</div>
+        <svg class="svc-icon" viewBox="0 0 34 34" fill="none"><rect x="6" y="6" width="22" height="22" rx="2" stroke="#2B9BDB" stroke-width="1.6"/><path d="M6 14h22M14 6v22" stroke="#8B939B" stroke-width="1.2"/></svg>
+        <h3>Rapid Prototyping</h3>
+        <p>Print-ready files and DFM review so the first physical part isn't the first time you catch a problem.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="work">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="section-tag">02 — <b>Selected Work</b></div>
+        <h2 class="section-title">Three builds, three constraints.</h2>
+      </div>
+      <p class="section-note">A sample of models where the constraint shaped the process as much as the design brief.</p>
+    </div>
+    <div class="work-grid reveal">
+      <div class="card">
+        <div class="card-face">
+          <div class="card-plane"></div>
+          <div class="card-index">PRD / 09</div>
+          <div class="card-tag">Product</div>
+          <h3>Aro Kettle</h3>
+          <p>Surfaced from a napkin sketch to a print-ready shell in four revision passes.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-face">
+          <div class="card-plane"></div>
+          <div class="card-index">MCH / 03</div>
+          <div class="card-tag">Mechanical</div>
+          <h3>Fenwick Hinge Assembly</h3>
+          <p>Toleranced to 0.05mm across 14 moving parts, validated before the first prototype was cut.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-face">
+          <div class="card-plane"></div>
+          <div class="card-index">VIZ / 15</div>
+          <div class="card-tag">Visualization</div>
+          <h3>Norrin Packaging Line</h3>
+          <p>A full render set replaced a physical photo shoot the client couldn't schedule in time.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="process">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="section-tag">03 — <b>Why One Model, Not Three</b></div>
+        <h2 class="section-title">The file you approve is the file that gets built.</h2>
+      </div>
+    </div>
+    <div class="strip reveal">
+      <p class="lead">Most studios remodel between concept, render, and manufacturing — and something drifts every time. We build <b>one base mesh</b> that carries through the whole job, so the geometry you sign off on in week one is the exact geometry that ships in week six.</p>
+      <div class="metric-list">
+        <div class="metric-row"><span class="label">Avg. concept-to-first-draft</span><span class="val">48 HRS</span></div>
+        <div class="metric-row"><span class="label">Revisions per project, avg.</span><span class="val">3.1</span></div>
+        <div class="metric-row"><span class="label">Models delivered manufacture-ready</span><span class="val">96%</span></div>
+        <div class="metric-row"><span class="label">Repeat clients</span><span class="val">71%</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact" style="border-bottom:none;">
+  <div class="wrap contact-inner">
+    <div class="reveal">
+      <h2>Have a sketch?<br>Send it over.</h2>
+      <p>A reference photo, a rough dimension, a competitor's part — any of it is enough to start. We'll scope the build and reply with a timeline, usually within one working day.</p>
+      <a href="mailto:studio@lotamodel.com" class="cta-btn">studio@lotamodel.com →</a>
+    </div>
+    <form class="reveal" onsubmit="event.preventDefault(); this.querySelector('.cta-btn').textContent='Sent — we\'ll be in touch';">
+      <div class="field">
+        <label for="name">Name</label>
+        <input id="name" type="text" required />
+      </div>
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" type="email" required />
+      </div>
+      <div class="field">
+        <label for="brief">Tell us what needs form</label>
+        <textarea id="brief" required></textarea>
+      </div>
+      <button type="submit" class="cta-btn">Send Brief →</button>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="flogo">
+      <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8 8H22V44H36V52H8V8Z" fill="#8B939B"/>
+        <path d="M22 8H32L38 20L44 8H54V52H44V26L38 36L32 26V52H22V8Z" fill="#2B9BDB"/>
+      </svg>
+      <span>LOTAMODEL</span>
+    </div>
+    <div class="ftag">Where Ideas Take Form.</div>
+    <div class="flinks">
+      <a href="#services">Services</a>
+      <a href="#work">Work</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+  // ---------- reveal on scroll ----------
+  const revealEls = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+  }, { threshold: 0.15 });
+  revealEls.forEach(el => io.observe(el));
+
+  // ---------- three.js hero: particles converging into a wireframe form ----------
+  const container = document.getElementById('scene');
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  let scene, camera, renderer, group, pointsMesh, formPositions, startPositions, formProgress = 0;
+  let targetRotX = 0.3, targetRotY = -0.5;
+  let curRotX = 0.3, curRotY = -0.5;
+  let dragging = false, lastX = 0, lastY = 0;
+
+  function icosahedronVertices(radius, detail){
+    const geo = new THREE.IcosahedronGeometry(radius, detail);
+    const pos = geo.attributes.position;
+    const pts = [];
+    for (let i = 0; i < pos.count; i++){
+      pts.push(new THREE.Vector3(pos.getX(i), pos.getY(i), pos.getZ(i)));
+    }
+    return { geo, pts };
+  }
+
+  function initScene(){
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(42, container.clientWidth / container.clientHeight, 0.1, 100);
+    camera.position.set(0, 1.2, 9);
+
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    container.appendChild(renderer.domElement);
+
+    group = new THREE.Group();
+    scene.add(group);
+
+    // wireframe edges of the target form (an icosahedron — "the model")
+    const { geo } = icosahedronVertices(2.3, 1);
+    const edges = new THREE.EdgesGeometry(geo);
+    const lineMat = new THREE.LineBasicMaterial({ color: 0x2B9BDB, transparent: true, opacity: 0 });
+    const lines = new THREE.LineSegments(edges, lineMat);
+    group.add(lines);
+
+    // point cloud that assembles into the form's vertices
+    const vertGeo = new THREE.IcosahedronGeometry(2.3, 3);
+    const vertPos = vertGeo.attributes.position;
+    const count = vertPos.count;
+
+    formPositions = new Float32Array(count * 3);
+    startPositions = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++){
+      formPositions[i*3] = vertPos.getX(i);
+      formPositions[i*3+1] = vertPos.getY(i);
+      formPositions[i*3+2] = vertPos.getZ(i);
+      startPositions[i*3] = (Math.random()-0.5) * 16;
+      startPositions[i*3+1] = (Math.random()-0.5) * 16;
+      startPositions[i*3+2] = (Math.random()-0.5) * 16;
+    }
+
+    const ptGeo = new THREE.BufferGeometry();
+    const livePos = new Float32Array(startPositions);
+    ptGeo.setAttribute('position', new THREE.BufferAttribute(livePos, 3));
+    const ptMat = new THREE.PointsMaterial({ color: 0x8FD4FF, size: 0.045, transparent: true, opacity: 0.9 });
+    pointsMesh = new THREE.Points(ptGeo, ptMat);
+    group.add(pointsMesh);
+
+    group.userData.lineMat = lineMat;
+
+    // floor grid for spatial context
+    const grid = new THREE.GridHelper(10, 20, 0x1D2227, 0x14171A);
+    grid.position.y = -2.6;
+    grid.material.transparent = true;
+    grid.material.opacity = 0.6;
+    group.add(grid);
+
+    group.rotation.x = curRotX;
+    group.rotation.y = curRotY;
+
+    const t0 = performance.now();
+    animate(t0);
+  }
+
+  function animate(now){
+    requestAnimationFrame(animate);
+    const t = now || performance.now();
+
+    if (!prefersReduced){
+      formProgress = Math.min(1, formProgress + 0.010);
+    } else {
+      formProgress = 1;
+    }
+    const ease = 1 - Math.pow(1 - formProgress, 3);
+
+    const posAttr = pointsMesh.geometry.attributes.position;
+    for (let i = 0; i < posAttr.count; i++){
+      const ix = i*3;
+      posAttr.array[ix]   = startPositions[ix]   + (formPositions[ix]   - startPositions[ix])   * ease;
+      posAttr.array[ix+1] = startPositions[ix+1] + (formPositions[ix+1] - startPositions[ix+1]) * ease;
+      posAttr.array[ix+2] = startPositions[ix+2] + (formPositions[ix+2] - startPositions[ix+2]) * ease;
+    }
+    posAttr.needsUpdate = true;
+    group.userData.lineMat.opacity = Math.max(0, (ease - 0.6) * 2.4) * 0.85;
+
+    if (!prefersReduced && !dragging){
+      targetRotY += 0.0014;
+    }
+    curRotX += (targetRotX - curRotX) * 0.06;
+    curRotY += (targetRotY - curRotY) * 0.06;
+    group.rotation.x = curRotX;
+    group.rotation.y = curRotY;
+
+    renderer.render(scene, camera);
+  }
+
+  function onResize(){
+    if (!renderer) return;
+    camera.aspect = container.clientWidth / container.clientHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(container.clientWidth, container.clientHeight);
+  }
+  window.addEventListener('resize', onResize);
+
+  function pointerDown(x, y){ dragging = true; lastX = x; lastY = y; }
+  function pointerMove(x, y){
+    if (!dragging) return;
+    const dx = x - lastX, dy = y - lastY;
+    targetRotY += dx * 0.005;
+    targetRotX += dy * 0.005;
+    targetRotX = Math.max(-0.9, Math.min(0.9, targetRotX));
+    lastX = x; lastY = y;
+  }
+  function pointerUp(){ dragging = false; }
+
+  container.addEventListener('mousedown', e => pointerDown(e.clientX, e.clientY));
+  window.addEventListener('mousemove', e => pointerMove(e.clientX, e.clientY));
+  window.addEventListener('mouseup', pointerUp);
+  container.addEventListener('touchstart', e => { const t = e.touches[0]; pointerDown(t.clientX, t.clientY); }, {passive:true});
+  window.addEventListener('touchmove', e => { const t = e.touches[0]; pointerMove(t.clientX, t.clientY); }, {passive:true});
+  window.addEventListener('touchend', pointerUp);
+
+  if (typeof THREE !== 'undefined'){
+    initScene();
+  }
+</script>
+
+</body>
+</html>
